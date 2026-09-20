@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lukmanisme — Sistem Kasir Mobile & Solusi UMKM Lapangan</title>
+  <meta name="description" content="Sistem kasir mobile yang ditempa dari realita lapangan warung makan, laundry, dan ritel UMKM. Pilih aplikasi siap pakai Balanjo POS atau bangun sistem beli lepas permanen.">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+  <!-- Open Graph & Social Share (WhatsApp / Facebook / LinkedIn) -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Lukmanisme — Sistem Kasir Mobile & Solusi UMKM">
+  <meta property="og:description" content="Sistem kasir praktis untuk Warung Makan, Laundry, dan Ritel. Tersedia via Balanjo POS (langganan hemat) maupun sistem kustom beli lepas permanen.">
+  <meta property="og:locale" content="id_ID">
+  
+  <!-- Twitter Cards -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Lukmanisme — Sistem Kasir Mobile & Solusi UMKM">
+  <meta name="twitter:description" content="Sistem kasir mobile yang lahir dari realita lapangan warung makan, laundry, dan ritel UMKM.">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: ['selector', '[data-theme="dark"]'],
+      theme: {
+        extend: {
+          fontFamily: {
+            heading: ['"Plus Jakarta Sans"', 'sans-serif'],
+            body: ['Inter', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            emerald: {
+              400: '#34d399',
+              500: '#10b981',
+              600: '#059669',
+            },
+            amber: {
+              400: '#fbbf24',
+              500: '#f59e0b',
+              600: '#d97706',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="min-h-screen flex flex-col bg-grid-pattern selection:bg-emerald-500/30 selection:text-emerald-300">
+
+  <!-- ============================================================ -->
+  <!-- TOP ANNOUNCEMENT & STATUS BAR -->
+  <!-- ============================================================ -->
+  <div class="border-b border-[var(--border-color)] bg-[var(--bg-secondary)]/80 backdrop-blur-md text-xs py-2 px-4 sticky top-0 z-50 transition-colors">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <span class="pulse-dot"></span>
+        <span class="font-mono text-xs font-semibold text-[var(--text-secondary)]">
+          <span class="text-[var(--text-primary)] font-bold">Lukmanisme:</span> 3 Sistem Aktif di Lapangan &bull; Balanjo POS Ready
+        </span>
+      </div>
+      
+      <!-- Right Utility Actions: Theme Toggle & Quick CTA -->
+      <div class="flex items-center gap-3">
+        <button id="theme-toggle-btn" class="flex items-center gap-1.5 py-1 px-2.5 rounded-lg border border-[var(--border-color)] hover:border-[var(--border-strong)] bg-[var(--bg-tertiary)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition text-xs font-mono">
+          <span id="theme-icon"></span>
+          <span id="theme-text">Light Mode</span>
+        </button>
+
+        <a href="#consultation" class="open-consultation-btn inline-flex items-center gap-1.5 py-1 px-3 rounded-lg bg-[var(--accent-emerald)] text-black font-semibold hover:opacity-90 transition text-xs font-mono" data-topic="general">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+          </svg>
+          <span>Konsultasi WA</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- MAIN NAVBAR -->
+  <!-- ============================================================ -->
+  <header class="border-b border-[var(--border-color)] bg-[var(--bg-primary)]/90 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 via-teal-500 to-amber-500 flex items-center justify-center text-black font-black text-xl shadow-lg shadow-emerald-500/10 border border-white/20">
+          L
+        </div>
+        <div>
+          <a href="#" class="font-extrabold text-xl tracking-tight text-[var(--text-primary)] hover:opacity-90 transition flex items-center gap-1.5">
+            Lukmanisme
+            <span class="text-xs px-2 py-0.5 rounded-full font-mono font-medium bg-[var(--accent-emerald-light)] text-[var(--accent-emerald)] border border-[var(--accent-emerald)]/30">Studio</span>
+          </a>
+          <p class="text-xs text-[var(--text-secondary)]">Where Logic Meets Ground-Reality</p>
+        </div>
+      </div>
+
+      <!-- Quick Dual-Track Switcher -->
+      <nav class="flex items-center bg-[var(--bg-tertiary)] p-1 rounded-xl border border-[var(--border-color)]" aria-label="Jalur Solusi">
+        <button class="track-tab-btn active px-3.5 py-1.5 rounded-lg text-xs font-semibold text-[var(--text-secondary)] transition" data-mode="all">
+          Semua Solusi
+        </button>
+        <button class="track-tab-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold text-[var(--text-secondary)] transition" data-mode="balanjo">
+          Balanjo POS (Langganan)
+        </button>
+        <button class="track-tab-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold text-[var(--text-secondary)] transition" data-mode="custom">
+          Sistem Kustom (Beli Lepas)
+        </button>
+      </nav>
+
+      <!-- Anchor Links -->
+      <div class="hidden lg:flex items-center gap-5 text-xs font-medium text-[var(--text-secondary)]">
+        <a href="#simulator" class="hover:text-[var(--text-primary)] transition">Simulasi Kasir</a>
+        <a href="#portofolio" class="hover:text-[var(--text-primary)] transition">Studi Kasus</a>
+        <a href="#komparasi" class="hover:text-[var(--text-primary)] transition">Perbandingan</a>
+        <a href="#manifesto" class="hover:text-[var(--text-primary)] transition">Filosofi</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============================================================ -->
+  <!-- HERO SECTION: THE FORK IN THE ROAD (DUAL TRACK SPLIT) -->
+  <!-- ============================================================ -->
+  <section class="py-14 lg:py-20 border-b border-[var(--border-color)] relative overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Headline & Introduction -->
+      <div class="text-center max-w-3xl mx-auto mb-14">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[var(--accent-emerald)]/30 bg-[var(--accent-emerald-glow)] text-[var(--accent-emerald)] text-xs font-mono mb-4">
+          <span>● Mobile-First POS untuk UMKM Lapangan</span>
+        </div>
+        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[var(--text-primary)] tracking-tight leading-[1.15]">
+          Sistem Kasir yang Lahir dari <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-400">Realita Lapangan.</span>
+        </h1>
+        <p class="mt-5 text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed">
+          Membantu operasional warung makan, laundry, dan ritel berjalan lebih rapi, cepat, dan transparan. 
+          Pilih antara aplikasi siap pakai berbasis langganan hemat atau bangun sistem beli lepas yang menjadi aset permanen usaha Anda.
+        </p>
+      </div>
+
+      <!-- THE TWO TRACKS (SPLIT CARDS) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
+        
+        <!-- Track 1: Balanjo POS (SaaS Langganan) -->
+        <div class="track-balanjo editorial-card rounded-2xl p-6 sm:p-8 flex flex-col justify-between border-2 border-emerald-500/30 hover:border-emerald-500/80 transition relative group">
+          <div class="absolute -top-3 right-6 bg-emerald-500 text-black font-mono font-bold text-[10px] uppercase tracking-wider px-3 py-1 rounded-full shadow">
+            Siap Pakai &bull; Ramah Modal
+          </div>
+          <div>
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                </svg>
+              </div>
+              <div>
+                <h2 class="text-2xl font-bold text-[var(--text-primary)] group-hover:text-emerald-400 transition">Balanjo POS</h2>
+                <p class="text-xs text-[var(--text-secondary)] font-mono">Mobile App &bull; Model Langganan Hemat</p>
+              </div>
+            </div>
+
+            <p class="text-sm text-[var(--text-secondary)] mb-6 leading-relaxed">
+              Aplikasi kasir mobile berbasis langganan untuk usaha yang butuh pencatatan instan hari ini juga. 
+              Cukup gunakan smartphone Android yang sudah ada, tanpa perlu investasi perangkat keras komputer yang mahal.
+            </p>
+
+            <ul class="space-y-2.5 text-xs text-[var(--text-secondary)] font-medium mb-8">
+              <li class="flex items-start gap-2.5">
+                <span class="text-emerald-400 font-bold mt-0.5">&#10003;</span>
+                <span><strong>Alur Transaksi Kilat:</strong> Selesai catat pesanan hanya dalam 2-3 sentuhan layar ponsel.</span>
+              </li>
+              <li class="flex items-start gap-2.5">
+                <span class="text-emerald-400 font-bold mt-0.5">&#10003;</span>
+                <span><strong>Fleksibel Lintas Sektor:</strong> Mode meja warung, hitungan kiloan laundry, hingga stok barang ritel.</span>
+              </li>
+              <li class="flex items-start gap-2.5">
+                <span class="text-emerald-400 font-bold mt-0.5">&#10003;</span>
+                <span><strong>Laporan Otomatis:</strong> Pantau omzet harian dan laba bersih langsung tanpa rumus akuntansi rumit.</span>
+              </li>
+              <li class="flex items-start gap-2.5">
+                <span class="text-emerald-400 font-bold mt-0.5">&#10003;</span>
+                <span><strong>Bebas Pusing Teknis:</strong> Pembaruan fitur berkala dan pencadangan data cloud otomatis.</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="pt-4 border-t border-[var(--border-color)] flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <div class="text-[11px] text-[var(--text-muted)] font-mono">COCOK UNTUK</div>
+              <div class="text-xs font-semibold text-[var(--text-primary)]">Usaha Baru & Tumbuh</div>
+            </div>
+            <div class="flex items-center gap-2">
+              <a href="#simulator" class="px-3 py-2 rounded-xl text-xs font-semibold bg-[var(--bg-tertiary)] hover:bg-[var(--border-color)] text-[var(--text-primary)] transition">
+                Coba Simulator
+              </a>
+              <button class="open-consultation-btn px-4 py-2 rounded-xl text-xs font-bold bg-emerald-500 hover:bg-emerald-400 text-black transition flex items-center gap-1.5" data-topic="balanjo">
+                <span>Coba Balanjo POS</span>
+                <span>&rarr;</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Track 2: Sistem Kustom (Beli Lepas & Permanent Asset) -->
+        <div class="track-custom editorial-card rounded-2xl p-6 sm:p-8 flex flex-col justify-between border-2 border-amber-500/30 hover:border-amber-500/80 transition relative group">
+          <div class="absolute -top-3 right-6 bg-amber-500 text-black font-mono font-bold text-[10px] uppercase tracking-wider px-3 py-1 rounded-full shadow">
+            Aset Permanen &bull; Bebas Iuran
+          </div>
+          <div>
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                </svg>
+              </div>
+              <div>
+                <h2 class="text-2xl font-bold text-[var(--text-primary)] group-hover:text-amber-400 transition">Sistem Kustom</h2>
+                <p class="text-xs text-[var(--text-secondary)] font-mono">Permanent License &bull; Beli Lepas Putus</p>
+              </div>
+            </div>
+
+            <p class="text-sm text-[var(--text-secondary)] mb-6 leading-relaxed">
+              Pengembangan sistem kasir independen dengan skema beli putus—sekali bayar untuk selamanya. 
+              Alur kerja disesuaikan 100% dengan kebiasaan unik operasional usaha Anda di lapangan tanpa keterikatan iuran bulanan.
+            </p>
+
+            <ul class="space-y-2.5 text-xs text-[var(--text-secondary)] font-medium mb-8">
+              <li class="flex items-start gap-2.5">
+                <span class="text-amber-400 font-bold mt-0.5">&#10003;</span>
+                <span><strong>100% Kepemilikan Digital:</strong> Menjadi aset usaha seutuhnya tanpa komisi transaksi atau biaya tersembunyi.</span>
+              </li>
+              <li class="flex items-start gap-2.5">
+                <span class="text-amber-400 font-bold mt-0.5">&#10003;</span>
+                <span><strong>Bekerja Tanpa Internet:</strong> Offline-ready, stabil di jaringan lokal dan printer thermal Bluetooth saku.</span>
+              </li>
+              <li class="flex items-start gap-2.5">
+                <span class="text-amber-400 font-bold mt-0.5">&#10003;</span>
+                <span><strong>Dirancang Khusus Alur Anda:</strong> Tombol, format nota, dan alur dapur disesuaikan persis kebutuhan Anda.</span>
+              </li>
+              <li class="flex items-start gap-2.5">
+                <span class="text-amber-400 font-bold mt-0.5">&#10003;</span>
+                <span><strong>Dukungan Langsung Engineer:</strong> Konsultasi dan pendampingan personal langsung bersama pengembang sistem.</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="pt-4 border-t border-[var(--border-color)] flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <div class="text-[11px] text-[var(--text-muted)] font-mono">COCOK UNTUK</div>
+              <div class="text-xs font-semibold text-[var(--text-primary)]">Usaha Mapan & Alur Khas</div>
+            </div>
+            <div class="flex items-center gap-2">
+              <a href="#portofolio" class="px-3 py-2 rounded-xl text-xs font-semibold bg-[var(--bg-tertiary)] hover:bg-[var(--border-color)] text-[var(--text-primary)] transition">
+                Lihat 3 Studi Kasus
+              </a>
+              <button class="open-consultation-btn px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-black transition flex items-center gap-1.5" data-topic="custom">
+                <span>Diskusi Beli Lepas</span>
+                <span>&rarr;</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- TRACK 1: BALANJO POS INTERACTIVE PLAYGROUND (SIMULATOR) -->
+  <!-- ============================================================ -->
+  <section id="simulator" class="track-balanjo py-16 border-b border-[var(--border-color)] bg-[var(--bg-secondary)]/50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+        <div>
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-emerald-500/10 text-emerald-400 text-xs font-mono font-semibold mb-2">
+            <span>● Interactive Playground</span>
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-[var(--text-primary)]">
+            Uji Coba Langsung Alur Kasir Lapangan
+          </h2>
+          <p class="text-xs sm:text-sm text-[var(--text-secondary)] mt-1">
+            Pilih sektor usaha di bawah, ketuk menu untuk menambah pesanan, dan klik cetak nota untuk melihat simulasi struk thermal.
+          </p>
+        </div>
+
+        <!-- Sector Mode Switcher -->
+        <div class="flex items-center gap-2 p-1 bg-zinc-900 border border-zinc-800 rounded-xl overflow-x-auto text-xs font-mono">
+          <button class="pos-sector-btn px-3 py-1.5 rounded-lg font-bold bg-emerald-500 text-black transition" data-sector="warung">
+            🍜 Warung Makan
+          </button>
+          <button class="pos-sector-btn px-3 py-1.5 rounded-lg text-zinc-300 hover:text-white transition" data-sector="laundry">
+            🧺 Laundry Datz
+          </button>
+          <button class="pos-sector-btn px-3 py-1.5 rounded-lg text-zinc-300 hover:text-white transition" data-sector="ritel">
+            🛒 Ritel / Toko
+          </button>
+        </div>
+      </div>
+
+      <!-- POS Interactive Interface Mockup -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- Left: Item Catalog (7 Cols) -->
+        <div class="lg:col-span-7 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-5 shadow-sm">
+          <div class="flex items-center justify-between pb-3 mb-4 border-b border-[var(--border-color)]">
+            <div>
+              <h3 id="pos-sector-title" class="font-bold text-base text-[var(--text-primary)]">Warung Jangkung (Sop Kaki & Sate)</h3>
+              <p id="pos-sector-badge" class="text-xs text-emerald-400 font-mono">F&B Mode • Meja & Bungkus</p>
+            </div>
+            <div class="text-[11px] text-[var(--text-muted)] font-mono">
+              Sentuh item untuk menambah
+            </div>
+          </div>
+
+          <div id="pos-items-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+        <!-- Right: Real-time Cart & Thermal Output (5 Cols) -->
+        <div class="lg:col-span-5 space-y-4">
+          
+          <!-- Cart Box -->
+          <div class="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-5 shadow-sm">
+            <div class="flex items-center justify-between pb-3 border-b border-[var(--border-color)] mb-3">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                <h4 class="font-bold text-sm text-[var(--text-primary)]">Antrean Kasir Mobile</h4>
+              </div>
+              <button id="pos-clear-btn" class="text-xs text-[var(--text-muted)] hover:text-red-400 font-mono transition">
+                Reset Antrean
+              </button>
+            </div>
+
+            <!-- Dine-in vs Takeaway Toggle (F&B) -->
+            <div class="flex items-center gap-2 mb-3 p-1 bg-[var(--bg-tertiary)] rounded-lg text-xs font-mono">
+              <button id="pos-order-dinein" class="flex-1 py-1 rounded bg-amber-500 text-black font-bold transition">
+                Makan di Tempat (Meja #4)
+              </button>
+              <button id="pos-order-takeaway" class="flex-1 py-1 rounded text-[var(--text-secondary)] font-bold transition">
+                Bungkus / Ambil
+              </button>
+            </div>
+
+            <!-- Cart List Container -->
+            <div id="pos-cart-list" class="max-h-48 overflow-y-auto space-y-1 pr-1 mb-4">
+              <!-- Populated via JS -->
+            </div>
+
+            <!-- Total and Action -->
+            <div class="pt-3 border-t border-[var(--border-color)] flex items-center justify-between mb-4">
+              <div>
+                <span class="text-xs text-[var(--text-muted)] font-mono block">TOTAL TAGIHAN</span>
+                <span id="pos-total-amount" class="text-xl font-mono font-black text-emerald-400">Rp 0</span>
+              </div>
+              <button id="pos-print-btn" disabled class="px-4 py-2.5 rounded-xl font-bold text-xs bg-emerald-500 hover:bg-emerald-400 disabled:opacity-40 disabled:cursor-not-allowed text-black transition flex items-center gap-2 shadow-lg shadow-emerald-500/10">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                </svg>
+                <span>Cetak Nota Digital</span>
+              </button>
+            </div>
+
+            <div class="text-[11px] text-[var(--text-secondary)] text-center">
+              Didukung integrasi printer thermal Bluetooth 58mm & kirim nota ke WhatsApp.
+            </div>
+          </div>
+
+          <!-- Thermal Receipt Output Display -->
+          <div id="pos-receipt-output">
+            <!-- Animated receipt shows up here -->
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- TRACK 2: BUKTI LAPANGAN - 3 STUDI KASUS SISTEM BELI LEPAS -->
+  <!-- ============================================================ -->
+  <section id="portofolio" class="track-custom py-16 lg:py-24 border-b border-[var(--border-color)]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-amber-500/10 text-amber-400 text-xs font-mono font-semibold mb-3">
+          <span>● Field Track Record &bull; Beli Lepas</span>
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-[var(--text-primary)]">
+          Ditempa Langsung di Meja Kasir Nyata
+        </h2>
+        <p class="text-sm sm:text-base text-[var(--text-secondary)] mt-3">
+          Logika sistem ini tidak dirancang di atas meja teori belaka, melainkan diuji langsung di tengah panasnya kuah sop, panggangan sate, dan tumpukan kiloan cucian.
+        </p>
+      </div>
+
+      <!-- 3 Case Study Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        
+        <!-- Case 1: Warung Jangkung -->
+        <div class="editorial-card rounded-2xl p-6 flex flex-col justify-between border border-[var(--border-color)] hover:border-amber-500/50 transition">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs px-2.5 py-1 rounded bg-amber-500/10 text-amber-400 font-mono font-bold border border-amber-500/20">F&B Tradisional</span>
+              <span class="text-[11px] text-[var(--text-muted)] font-mono">Beli Lepas Aktif</span>
+            </div>
+            
+            <h3 class="text-xl font-bold text-[var(--text-primary)] mb-1">Warung Jangkung</h3>
+            <p class="text-xs text-[var(--text-secondary)] font-mono mb-4">Sop Kaki Kambing & Sate Khas</p>
+
+            <div class="space-y-4 text-xs">
+              <div class="p-3 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)]">
+                <span class="font-bold text-red-400 uppercase tracking-wide block mb-1">Tantangan Lapangan:</span>
+                <p class="text-[var(--text-secondary)] leading-relaxed">
+                  Jam makan malam sangat padat, pesanan variatif (porsi kuah santan/bening, racikan sate tanpa lemak), kasir sering panik mencatat manual, dan risiko salah hitung saat melayani antrean berjejal.
+                </p>
+              </div>
+
+              <div class="p-3 rounded-xl bg-emerald-950/20 border border-emerald-800/30">
+                <span class="font-bold text-emerald-400 uppercase tracking-wide block mb-1">Solusi Sistem yang Dibangun:</span>
+                <p class="text-[var(--text-secondary)] leading-relaxed">
+                  Alur kasir kilat dengan pemisahan instan pesanan meja vs bungkus dalam 1 klik, integrasi cetak cepat nota dapur, serta rekap stok porsi harian anti-selisih.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-6 pt-4 border-t border-[var(--border-color)] flex items-center justify-between text-xs">
+            <span class="text-[var(--text-muted)] font-mono">Dampak Operasional:</span>
+            <span class="font-bold text-emerald-400 font-mono">Antrean 2x Lebih Cepat</span>
+          </div>
+        </div>
+
+        <!-- Case 2: Warung Batagor & Baso Cuangki -->
+        <div class="editorial-card rounded-2xl p-6 flex flex-col justify-between border border-[var(--border-color)] hover:border-amber-500/50 transition">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs px-2.5 py-1 rounded bg-amber-500/10 text-amber-400 font-mono font-bold border border-amber-500/20">Jajanan Cepat Saji</span>
+              <span class="text-[11px] text-[var(--text-muted)] font-mono">Beli Lepas Aktif</span>
+            </div>
+            
+            <h3 class="text-xl font-bold text-[var(--text-primary)] mb-1">Warung Batagor & Cuangki</h3>
+            <p class="text-xs text-[var(--text-secondary)] font-mono mb-4">Fast-Turnover & Pecahan Kecil</p>
+
+            <div class="space-y-4 text-xs">
+              <div class="p-3 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)]">
+                <span class="font-bold text-red-400 uppercase tracking-wide block mb-1">Tantangan Lapangan:</span>
+                <p class="text-[var(--text-secondary)] leading-relaxed">
+                  Perputaran pesanan sangat cepat dalam hitungan menit, transaksi bernilai pecahan kecil (Rp 10.000 - Rp 25.000), variasi bumbu kacang/kuah pedas, dan keterbatasan ruang meja kasir.
+                </p>
+              </div>
+
+              <div class="p-3 rounded-xl bg-emerald-950/20 border border-emerald-800/30">
+                <span class="font-bold text-emerald-400 uppercase tracking-wide block mb-1">Solusi Sistem yang Dibangun:</span>
+                <p class="text-[var(--text-secondary)] leading-relaxed">
+                  Tombol menu quick-tap besar, kalkulasi otomatis uang kembalian pecahan receh, dan integrasi printer thermal Bluetooth saku tanpa kabel yang bisa dibawa mobile.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-6 pt-4 border-t border-[var(--border-color)] flex items-center justify-between text-xs">
+            <span class="text-[var(--text-muted)] font-mono">Dampak Operasional:</span>
+            <span class="font-bold text-emerald-400 font-mono">Nol Selisih Kas Harian</span>
+          </div>
+        </div>
+
+        <!-- Case 3: Laundry Datz -->
+        <div class="editorial-card rounded-2xl p-6 flex flex-col justify-between border border-[var(--border-color)] hover:border-amber-500/50 transition">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs px-2.5 py-1 rounded bg-amber-500/10 text-amber-400 font-mono font-bold border border-amber-500/20">Jasa & Pelayanan</span>
+              <span class="text-[11px] text-[var(--text-muted)] font-mono">Beli Lepas Aktif</span>
+            </div>
+            
+            <h3 class="text-xl font-bold text-[var(--text-primary)] mb-1">Laundry Datz</h3>
+            <p class="text-xs text-[var(--text-secondary)] font-mono mb-4">Laundry Express & Setrika</p>
+
+            <div class="space-y-4 text-xs">
+              <div class="p-3 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)]">
+                <span class="font-bold text-red-400 uppercase tracking-wide block mb-1">Tantangan Lapangan:</span>
+                <p class="text-[var(--text-secondary)] leading-relaxed">
+                  Nota kertas pelanggan sering basah atau tercecer di rak, cucian rentan tertukar saat jam sibuk, dan banyaknya pelanggan yang belum lunas saat menaruh cucian kiloan.
+                </p>
+              </div>
+
+              <div class="p-3 rounded-xl bg-emerald-950/20 border border-emerald-800/30">
+                <span class="font-bold text-emerald-400 uppercase tracking-wide block mb-1">Solusi Sistem yang Dibangun:</span>
+                <p class="text-[var(--text-secondary)] leading-relaxed">
+                  Kalkulasi timbangan kiloan otomatis, pelacakan alur jelas (Diterima &rarr; Cuci &rarr; Kering &rarr; Setrika &rarr; Siap Ambil), serta pemisahan tegas status bayar di awal vs bayar saat ambil.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-6 pt-4 border-t border-[var(--border-color)] flex items-center justify-between text-xs">
+            <span class="text-[var(--text-muted)] font-mono">Dampak Operasional:</span>
+            <span class="font-bold text-emerald-400 font-mono">Nol Insiden Cucian Hilang</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- TRANSPARENT COMPARISON: LANGGANAN VS BELI LEPAS -->
+  <!-- ============================================================ -->
+  <section id="komparasi" class="py-16 border-b border-[var(--border-color)] bg-[var(--bg-primary)]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-3xl mx-auto mb-12">
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-[var(--text-primary)]">
+          Pilih Model yang Paling Sehat untuk Arus Kas Anda
+        </h2>
+        <p class="text-xs sm:text-sm text-[var(--text-secondary)] mt-2">
+          Transparansi penuh: tidak ada biaya tersembunyi, tidak ada komisi per transaksi yang memotong margin usaha Anda.
+        </p>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs sm:text-sm">
+          <thead>
+            <tr class="border-b-2 border-[var(--border-color)] text-[var(--text-muted)] font-mono uppercase text-[11px]">
+              <th class="py-3 px-4">Parameter</th>
+              <th class="py-3 px-4 text-emerald-400">Balanjo POS (Langganan)</th>
+              <th class="py-3 px-4 text-amber-400">Sistem Kustom (Beli Lepas)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[var(--border-color)] font-medium text-[var(--text-secondary)]">
+            <tr>
+              <td class="py-3.5 px-4 font-bold text-[var(--text-primary)]">Investasi Modal Awal</td>
+              <td class="py-3.5 px-4 text-emerald-400 font-bold">Sangat Rendah (Mulai Rp puluhan ribu)</td>
+              <td class="py-3.5 px-4 text-amber-400 font-bold">Satu Kali di Awal (Investasi Aset)</td>
+            </tr>
+            <tr>
+              <td class="py-3.5 px-4 font-bold text-[var(--text-primary)]">Biaya Bulanan</td>
+              <td class="py-3.5 px-4">Iuran berkala hemat bulanan / tahunan</td>
+              <td class="py-3.5 px-4 text-[var(--text-primary)] font-bold">Rp 0 (Selamanya Bebas Iuran)</td>
+            </tr>
+            <tr>
+              <td class="py-3.5 px-4 font-bold text-[var(--text-primary)]">Status Kepemilikan</td>
+              <td class="py-3.5 px-4">Sewa software siap pakai (SaaS)</td>
+              <td class="py-3.5 px-4 text-[var(--text-primary)] font-bold">100% Aset Permanen Milik Usaha</td>
+            </tr>
+            <tr>
+              <td class="py-3.5 px-4 font-bold text-[var(--text-primary)]">Kustomisasi Alur Usaha</td>
+              <td class="py-3.5 px-4">Standar industri UMKM (Warung, Laundry, Ritel)</td>
+              <td class="py-3.5 px-4 text-amber-400 font-bold">100% Sesuai Kebiasaan Meja Kasir Anda</td>
+            </tr>
+            <tr>
+              <td class="py-3.5 px-4 font-bold text-[var(--text-primary)]">Koneksi Internet</td>
+              <td class="py-3.5 px-4">Bisa offline, sync saat terhubung internet</td>
+              <td class="py-3.5 px-4">Full Offline di HP & Jaringan Lokal</td>
+            </tr>
+            <tr>
+              <td class="py-3.5 px-4 font-bold text-[var(--text-primary)]">Target Pengguna</td>
+              <td class="py-3.5 px-4">Usaha rintisan yang ingin langsung jalan</td>
+              <td class="py-3.5 px-4">Usaha mapan yang ingin meniadakan beban iuran</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- MANIFESTO & FILOSOFI LUKMANISME -->
+  <!-- ============================================================ -->
+  <section id="manifesto" class="py-16 lg:py-24 border-b border-[var(--border-color)] bg-[var(--bg-secondary)]/30">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      
+      <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-400 mb-6">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+        </svg>
+      </div>
+
+      <blockquote class="text-xl sm:text-2xl lg:text-3xl font-bold text-[var(--text-primary)] leading-snug tracking-tight mb-6">
+        &ldquo;Sistem terbaik bukan yang memiliki menu paling banyak, melainkan yang paling tenang dan andal saat antrean pelanggan sedang ramai-ramainya.&rdquo;
+      </blockquote>
+
+      <p class="text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed max-w-2xl mx-auto mb-8">
+        Lukmanisme percaya bahwa teknologi untuk usaha rakyat harus dirancang dengan empati. 
+        Bukan memaksa pedagang beradaptasi dengan kerumitan komputer, melainkan merekayasa sistem agar bekerja mulus di belakang layar—membantu manusia melayani manusia lainnya dengan lebih hangat.
+      </p>
+
+      <div class="flex flex-wrap items-center justify-center gap-3 text-xs font-mono text-[var(--text-muted)]">
+        <span class="px-3 py-1 rounded bg-[var(--bg-tertiary)] border border-[var(--border-color)]">● Zero Confusion UI</span>
+        <span class="px-3 py-1 rounded bg-[var(--bg-tertiary)] border border-[var(--border-color)]">● Real-World Tested</span>
+        <span class="px-3 py-1 rounded bg-[var(--bg-tertiary)] border border-[var(--border-color)]">● Direct Developer Support</span>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- FOOTER & DIRECT CONTACT -->
+  <!-- ============================================================ -->
+  <footer class="mt-auto border-t border-[var(--border-color)] bg-[var(--bg-secondary)] py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-8 mb-10">
+        
+        <div class="md:col-span-5">
+          <div class="flex items-center gap-2 mb-3">
+            <div class="w-8 h-8 rounded-lg bg-emerald-500 text-black flex items-center justify-center font-black">L</div>
+            <span class="font-extrabold text-lg text-[var(--text-primary)]">Lukmanisme</span>
+          </div>
+          <p class="text-xs text-[var(--text-secondary)] leading-relaxed max-w-sm mb-4">
+            Rekayasa sistem kasir mobile praktis dan solusi teknologi yang berpihak pada kemandirian operasional UMKM.
+          </p>
+          <div class="text-xs font-mono text-emerald-400">
+            &bull; Portofolio aktif: Warung Jangkung, Batagor & Cuangki, Laundry Datz.
+          </div>
+        </div>
+
+        <div class="md:col-span-3 text-xs space-y-2">
+          <div class="font-bold font-mono uppercase tracking-wider text-[var(--text-primary)] mb-3">Jalur Solusi</div>
+          <div><a href="#simulator" class="text-[var(--text-secondary)] hover:text-emerald-400 transition">Balanjo POS (Langganan)</a></div>
+          <div><a href="#portofolio" class="text-[var(--text-secondary)] hover:text-amber-400 transition">Sistem Kustom (Beli Lepas)</a></div>
+          <div><a href="#komparasi" class="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition">Tabel Perbandingan Biaya</a></div>
+          <div><a href="#manifesto" class="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition">Filosofi & Nilai Kerja</a></div>
+        </div>
+
+        <div class="md:col-span-4 text-xs space-y-3">
+          <div class="font-bold font-mono uppercase tracking-wider text-[var(--text-primary)] mb-3">Hubungi Pengembang</div>
+          <p class="text-[var(--text-secondary)] leading-relaxed">
+            Ingin mendiskusikan kebutuhan kasir warung/laundry Anda atau mencoba demo Balanjo POS?
+          </p>
+          <div>
+            <button class="open-consultation-btn w-full py-2.5 px-4 rounded-xl bg-[var(--accent-emerald)] hover:bg-emerald-400 text-black font-bold text-xs font-mono transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/10" data-topic="general">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766 0-3.18-2.587-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.698.074-2.112-.511-1.808-.747-2.977-2.582-3.067-2.702-.09-.12-1.737-2.31-1.737-4.406 0-2.096 1.099-3.124 1.488-3.548.389-.424.847-.53 1.131-.53.283 0 .566.002.813.014.262.012.613-.099.959.73.359.863 1.224 2.986 1.33 3.204.106.218.177.472.035.755-.141.282-.212.459-.424.707-.212.247-.446.553-.638.742-.213.209-.434.437-.187.86.247.424 1.096 1.808 2.35 2.925 1.614 1.439 2.975 1.884 3.399 2.096.424.212.673.177.92-.106.247-.283 1.059-1.235 1.341-1.659.282-.424.566-.353.953-.212.389.141 2.471 1.165 2.894 1.377.424.212.707.318.813.495.106.177.106 1.024-.038 1.429z"></path>
+              </svg>
+              <span>Diskusi Langsung via WhatsApp</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="border-t border-[var(--border-color)] pt-6 flex flex-col sm:flex-row items-center justify-between text-[11px] text-[var(--text-muted)] font-mono gap-2">
+        <div>&copy; 2026 Lukmanisme. All rights reserved.</div>
+        <div class="flex items-center gap-4">
+          <span>Engineered with Precision</span>
+          <span>&bull;</span>
+          <span>Crafted for UMKM</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ============================================================ -->
+  <!-- ACCESSIBLE CONSULTATION MODAL DIALOG -->
+  <!-- ============================================================ -->
+  <dialog id="consultation-dialog" class="custom-dialog">
+    <div class="p-6">
+      <div class="flex items-center justify-between pb-3 border-b border-[var(--border-color)] mb-4">
+        <div>
+          <h3 class="text-base font-bold text-[var(--text-primary)]">Konsultasi Sistem Kasir</h3>
+          <p class="text-xs text-[var(--text-secondary)]">Terhubung langsung dengan pengembang Lukmanisme</p>
+        </div>
+        <button id="close-dialog-btn" class="w-8 h-8 rounded-lg border border-[var(--border-color)] flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] transition" aria-label="Tutup Dialog">
+          &times;
+        </button>
+      </div>
+
+      <form id="consultation-form" class="space-y-4 text-xs">
+        <div>
+          <label for="consult-name" class="block font-medium text-[var(--text-primary)] mb-1">Nama Lengkap / Panggilan:</label>
+          <input type="text" id="consult-name" required placeholder="Contoh: Lukman / Budi" class="w-full px-3 py-2 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-color)] focus:border-emerald-500 focus:outline-none text-[var(--text-primary)] transition">
+        </div>
+
+        <div>
+          <label for="consult-business" class="block font-medium text-[var(--text-primary)] mb-1">Jenis Usaha:</label>
+          <input type="text" id="consult-business" required placeholder="Contoh: Warung Bakso / Laundry Kiloan / Toko Kelontong" class="w-full px-3 py-2 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-color)] focus:border-emerald-500 focus:outline-none text-[var(--text-primary)] transition">
+        </div>
+
+        <div>
+          <label for="consult-topic" class="block font-medium text-[var(--text-primary)] mb-1">Kebutuhan Utama:</label>
+          <select id="consult-topic" class="w-full px-3 py-2 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-color)] focus:border-emerald-500 focus:outline-none text-[var(--text-primary)] transition">
+            <option value="balanjo">Coba Demo Balanjo POS (Langganan Hemat)</option>
+            <option value="custom">Konsultasi Sistem Kustom Beli Lepas (Tanpa Biaya Bulanan)</option>
+            <option value="case_study">Diskusi Teknis Portofolio (Warung Jangkung/Laundry Datz)</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="consult-note" class="block font-medium text-[var(--text-primary)] mb-1">Catatan Tambahan (Opsional):</label>
+          <textarea id="consult-note" rows="3" placeholder="Ceritakan kendala kasir Anda saat ini (misal: antrean ramai sering salah nota)..." class="w-full px-3 py-2 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-color)] focus:border-emerald-500 focus:outline-none text-[var(--text-primary)] transition"></textarea>
+        </div>
+
+        <button type="submit" class="w-full py-2.5 rounded-xl font-bold bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-mono transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/10">
+          <span>Lanjutkan ke WhatsApp</span>
+          <span>&rarr;</span>
+        </button>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- Main JavaScript Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
