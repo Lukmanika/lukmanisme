@@ -12,22 +12,26 @@ document.addEventListener('DOMContentLoaded', () => {
 // ==========================================
 let audioCtx = null;
 function getAudioContext() {
-  if (!audioCtx) {
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    if (AudioContextClass) {
-      audioCtx = new AudioContextClass();
+  try {
+    if (!audioCtx) {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (AudioContextClass) {
+        audioCtx = new AudioContextClass();
+      }
     }
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume().catch(() => {});
+    }
+    return audioCtx;
+  } catch (e) {
+    return null;
   }
-  if (audioCtx && audioCtx.state === 'suspended') {
-    audioCtx.resume();
-  }
-  return audioCtx;
 }
 
 function playMechanicalClick() {
   try {
     const ctx = getAudioContext();
-    if (!ctx) return;
+    if (!ctx || ctx.state !== 'running') return;
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.type = 'triangle';
@@ -39,15 +43,13 @@ function playMechanicalClick() {
     gain.connect(ctx.destination);
     osc.start();
     osc.stop(ctx.currentTime + 0.05);
-  } catch (e) {
-    console.debug('Audio not allowed yet:', e);
-  }
+  } catch (e) {}
 }
 
 function playBeepSound() {
   try {
     const ctx = getAudioContext();
-    if (!ctx) return;
+    if (!ctx || ctx.state !== 'running') return;
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.type = 'sine';
@@ -61,8 +63,28 @@ function playBeepSound() {
   } catch (e) {}
 }
 
+function playPrintSound() {
+  try {
+    const ctx = getAudioContext();
+    if (!ctx || ctx.state !== 'running') return;
+    // Simulate thermal gear stepper sound
+    for (let i = 0; i < 4; i++) {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(400 + i * 50, ctx.currentTime + i * 0.1);
+      gain.gain.setValueAtTime(0.04, ctx.currentTime + i * 0.1);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.1 + 0.06);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(ctx.currentTime + i * 0.1);
+      osc.stop(ctx.currentTime + i * 0.1 + 0.07);
+    }
+  } catch (e) {}
+}
+
 function initSoundEffects() {
-  document.querySelectorAll('button, a.btn-action').forEach(el => {
+  document.querySelectorAll('button:not(.silent), a.btn-action').forEach(el => {
     el.addEventListener('click', () => {
       playMechanicalClick();
     });
@@ -181,47 +203,52 @@ const POS_CATALOGS = {
 let currentSector = 'warung';
 let cart = {};
 let orderType = 'dine_in'; // dine_in vs takeaway
-let paymentType = 'lunas'; // lunas vs pending
 
 function initPosSimulator() {
   renderSectorCatalog();
+  updateCartDisplay();
 
-  // Tab mode listener
+  // Sector Mode Buttons
   document.querySelectorAll('.pos-sector-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.pos-sector-btn').forEach(b => {
-        b.classList.remove('bg-emerald-500', 'text-black', 'border-emerald-500');
-        b.classList.add('bg-zinc-800', 'text-zinc-300');
+        b.classList.remove('bg-emerald-500', 'text-black', 'font-bold');
+        b.classList.add('text-zinc-400');
       });
-      btn.classList.add('bg-emerald-500', 'text-black', 'border-emerald-500');
-      btn.classList.remove('bg-zinc-800', 'text-zinc-300');
+      btn.classList.add('bg-emerald-500', 'text-black', 'font-bold');
+      btn.classList.remove('text-zinc-400');
 
       currentSector = btn.dataset.sector;
       cart = {};
       renderSectorCatalog();
       updateCartDisplay();
+      
+      const receiptContainer = document.getElementById('pos-receipt-output');
+      if (receiptContainer) receiptContainer.innerHTML = '';
       playMechanicalClick();
     });
   });
 
-  // Order option toggles
+  // Dine-in vs Takeaway Buttons
   const dineInBtn = document.getElementById('pos-order-dinein');
   const takeawayBtn = document.getElementById('pos-order-takeaway');
   if (dineInBtn && takeawayBtn) {
     dineInBtn.addEventListener('click', () => {
       orderType = 'dine_in';
       dineInBtn.classList.add('bg-amber-500', 'text-black');
-      dineInBtn.classList.remove('bg-zinc-800', 'text-zinc-400');
+      dineInBtn.classList.remove('bg-transparent', 'text-[var(--text-secondary)]');
       takeawayBtn.classList.remove('bg-amber-500', 'text-black');
-      takeawayBtn.classList.add('bg-zinc-800', 'text-zinc-400');
+      takeawayBtn.classList.add('bg-transparent', 'text-[var(--text-secondary)]');
+      playMechanicalClick();
     });
 
     takeawayBtn.addEventListener('click', () => {
       orderType = 'takeaway';
       takeawayBtn.classList.add('bg-amber-500', 'text-black');
-      takeawayBtn.classList.remove('bg-zinc-800', 'text-zinc-400');
+      takeawayBtn.classList.remove('bg-transparent', 'text-[var(--text-secondary)]');
       dineInBtn.classList.remove('bg-amber-500', 'text-black');
-      dineInBtn.classList.add('bg-zinc-800', 'text-zinc-400');
+      dineInBtn.classList.add('bg-transparent', 'text-[var(--text-secondary)]');
+      playMechanicalClick();
     });
   }
 
@@ -233,12 +260,13 @@ function initPosSimulator() {
     });
   }
 
-  // Reset Cart Button
+  // Clear Cart Button
   const clearBtn = document.getElementById('pos-clear-btn');
   if (clearBtn) {
     clearBtn.addEventListener('click', () => {
       cart = {};
       updateCartDisplay();
+      renderSectorCatalog();
       const receiptContainer = document.getElementById('pos-receipt-output');
       if (receiptContainer) receiptContainer.innerHTML = '';
       playMechanicalClick();
@@ -259,33 +287,65 @@ function renderSectorCatalog() {
   container.innerHTML = '';
 
   sectorData.items.forEach(item => {
+    const qtyInCart = cart[item.id] ? cart[item.id].qty : 0;
     const card = document.createElement('div');
-    card.className = 'p-3 rounded-xl border border-zinc-700/60 bg-zinc-900/70 hover:border-emerald-500/60 transition cursor-pointer flex flex-col justify-between select-none';
+    card.className = `p-4 rounded-xl border transition cursor-pointer flex flex-col justify-between select-none ${
+      qtyInCart > 0 
+        ? 'border-emerald-500 bg-[var(--bg-tertiary)] shadow-md shadow-emerald-500/10' 
+        : 'border-[var(--border-color)] bg-[var(--bg-secondary)] hover:border-emerald-500/50'
+    }`;
+
     card.innerHTML = `
       <div>
-        <div class="flex items-start justify-between gap-1">
-          <h4 class="font-semibold text-sm text-zinc-100">${item.name}</h4>
-          <span class="text-xs px-2 py-0.5 rounded font-mono font-bold bg-emerald-950/80 text-emerald-400 border border-emerald-800/40">
+        <div class="flex items-start justify-between gap-2">
+          <h4 class="font-bold text-sm text-[var(--text-primary)] leading-tight">${item.name}</h4>
+          <span class="text-xs px-2 py-0.5 rounded font-mono font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/30 whitespace-nowrap">
             ${formatRupiah(item.price)}
           </span>
         </div>
-        <p class="text-xs text-zinc-400 mt-1">${item.desc}</p>
+        <p class="text-xs text-[var(--text-secondary)] mt-1.5 leading-relaxed">${item.desc}</p>
       </div>
-      <button class="mt-3 w-full py-1.5 px-3 bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-black rounded-lg text-xs font-bold transition flex items-center justify-center gap-1">
-        <span>+ Tambah</span>
-      </button>
+
+      <div class="mt-4 pt-3 border-t border-[var(--border-color)] flex items-center justify-between gap-2">
+        <div>
+          ${qtyInCart > 0 
+            ? `<span class="text-[11px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-500 text-black">✓ ${qtyInCart}x di antrean</span>` 
+            : `<span class="text-[11px] text-[var(--text-muted)] font-mono">Ketuk untuk pilih</span>`
+          }
+        </div>
+        <button type="button" class="btn-add-item py-1.5 px-3 rounded-lg text-xs font-bold font-mono transition flex items-center gap-1 ${
+          qtyInCart > 0
+            ? 'bg-emerald-500 text-black hover:bg-emerald-400'
+            : 'bg-emerald-500/15 hover:bg-emerald-500 text-emerald-500 hover:text-black'
+        }">
+          <span>+ Tambah</span>
+        </button>
+      </div>
     `;
 
+    // Click whole card
     card.addEventListener('click', () => {
-      addItemToCart(item);
-      playBeepSound();
+      addItemToCartById(item.id);
     });
+
+    // Click button explicitly
+    const addBtn = card.querySelector('.btn-add-item');
+    if (addBtn) {
+      addBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        addItemToCartById(item.id);
+      });
+    }
 
     container.appendChild(card);
   });
 }
 
-function addItemToCart(item) {
+function addItemToCartById(itemId) {
+  const sectorData = POS_CATALOGS[currentSector];
+  const item = sectorData.items.find(i => i.id === itemId);
+  if (!item) return;
+
   if (cart[item.id]) {
     cart[item.id].qty += 1;
   } else {
@@ -297,18 +357,22 @@ function addItemToCart(item) {
       qty: 1
     };
   }
+
+  playBeepSound();
   updateCartDisplay();
+  renderSectorCatalog();
 }
 
-function removeItemFromCart(id) {
-  if (cart[id]) {
-    if (cart[id].qty > 1) {
-      cart[id].qty -= 1;
+function removeItemFromCart(itemId) {
+  if (cart[itemId]) {
+    if (cart[itemId].qty > 1) {
+      cart[itemId].qty -= 1;
     } else {
-      delete cart[id];
+      delete cart[itemId];
     }
-    updateCartDisplay();
     playMechanicalClick();
+    updateCartDisplay();
+    renderSectorCatalog();
   }
 }
 
@@ -325,16 +389,24 @@ function updateCartDisplay() {
 
   if (itemKeys.length === 0) {
     cartList.innerHTML = `
-      <div class="p-6 text-center text-zinc-500 text-xs font-mono">
-        Belum ada item dipilih.<br>Ketuk item menu di sebelah kiri untuk menambah ke antrean kasir.
+      <div class="p-6 text-center text-[var(--text-muted)] text-xs font-mono border border-dashed border-[var(--border-color)] rounded-xl">
+        <div class="text-base mb-1">🛒</div>
+        Belum ada item di antrean.<br>
+        <span class="text-[var(--text-secondary)]">Ketuk menu di sebelah kiri untuk menambah.</span>
       </div>
     `;
     if (totalAmountEl) totalAmountEl.textContent = 'Rp 0';
-    if (printBtn) printBtn.disabled = true;
+    if (printBtn) {
+      printBtn.disabled = true;
+      printBtn.classList.add('opacity-40', 'cursor-not-allowed');
+    }
     return;
   }
 
-  if (printBtn) printBtn.disabled = false;
+  if (printBtn) {
+    printBtn.disabled = false;
+    printBtn.classList.remove('opacity-40', 'cursor-not-allowed');
+  }
 
   itemKeys.forEach(key => {
     const item = cart[key];
@@ -342,18 +414,18 @@ function updateCartDisplay() {
     total += subtotal;
 
     const row = document.createElement('div');
-    row.className = 'flex items-center justify-between text-xs py-1.5 border-b border-zinc-800 font-mono';
+    row.className = 'flex items-center justify-between text-xs py-2 px-2.5 rounded-lg border border-[var(--border-color)] bg-[var(--bg-tertiary)] font-mono';
     row.innerHTML = `
       <div class="flex-1 pr-2 truncate">
-        <span class="text-zinc-200 font-medium">${item.name}</span>
-        <div class="text-[10px] text-zinc-500">${formatRupiah(item.price)} x ${item.qty}</div>
+        <div class="text-[var(--text-primary)] font-bold truncate">${item.name}</div>
+        <div class="text-[11px] text-[var(--text-muted)]">${formatRupiah(item.price)} &times; ${item.qty}</div>
       </div>
-      <div class="flex items-center gap-2">
-        <span class="font-bold text-emerald-400">${formatRupiah(subtotal)}</span>
-        <div class="flex items-center gap-1 bg-zinc-800 rounded px-1">
-          <button class="px-1 text-zinc-400 hover:text-red-400 font-bold" onclick="removeItemFromCart('${item.id}')">-</button>
-          <span class="text-zinc-200 font-bold">${item.qty}</span>
-          <button class="px-1 text-zinc-400 hover:text-emerald-400 font-bold" onclick="addItemToCart({id:'${item.id}', name:'${item.name}', price:${item.price}})">+</button>
+      <div class="flex items-center gap-3">
+        <span class="font-bold text-emerald-500 font-mono text-xs">${formatRupiah(subtotal)}</span>
+        <div class="flex items-center gap-1 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md px-1 py-0.5">
+          <button type="button" class="w-5 h-5 flex items-center justify-center text-[var(--text-secondary)] hover:text-red-400 font-bold" onclick="removeItemFromCart('${item.id}')">-</button>
+          <span class="text-[var(--text-primary)] font-bold text-xs px-1">${item.qty}</span>
+          <button type="button" class="w-5 h-5 flex items-center justify-center text-[var(--text-secondary)] hover:text-emerald-400 font-bold" onclick="addItemToCartById('${item.id}')">+</button>
         </div>
       </div>
     `;
@@ -363,8 +435,8 @@ function updateCartDisplay() {
   if (totalAmountEl) totalAmountEl.textContent = formatRupiah(total);
 }
 
-// Make functions accessible from onclick HTML attributes
-window.addItemToCart = (item) => addItemToCart(item);
+// Global functions for inline onclick handlers
+window.addItemToCartById = (id) => addItemToCartById(id);
 window.removeItemFromCart = (id) => removeItemFromCart(id);
 
 function generateThermalReceipt() {
@@ -374,7 +446,7 @@ function generateThermalReceipt() {
   const itemKeys = Object.keys(cart);
   if (itemKeys.length === 0) return;
 
-  playBeepSound();
+  playPrintSound();
 
   const sectorData = POS_CATALOGS[currentSector];
   const now = new Date();
@@ -390,9 +462,9 @@ function generateThermalReceipt() {
     const subtotal = item.price * item.qty;
     total += subtotal;
     itemsHtml += `
-      <div class="flex justify-between py-0.5">
-        <span>${item.qty}x ${item.name.substring(0, 18)}</span>
-        <span>${formatRupiah(subtotal)}</span>
+      <div class="flex justify-between py-0.5 text-zinc-900">
+        <span class="font-medium">${item.qty}x ${item.name.substring(0, 19)}</span>
+        <span class="font-bold">${formatRupiah(subtotal)}</span>
       </div>
     `;
   });
@@ -403,48 +475,67 @@ function generateThermalReceipt() {
     : 'LUNAS (CASH/QRIS)';
 
   receiptContainer.innerHTML = `
-    <div class="receipt-paper animate-print p-4 rounded-t-lg max-w-sm mx-auto text-xs text-zinc-200 border-dashed border-zinc-600 bg-zinc-950 font-mono shadow-2xl">
-      <div class="text-center border-b border-zinc-700/80 pb-2 mb-2">
-        <div class="font-bold text-sm tracking-wider uppercase">${sectorData.title}</div>
-        <div class="text-[10px] text-zinc-400">Powered by Balanjo POS / Lukmanisme</div>
-        <div class="text-[10px] text-emerald-400 mt-1">● THERMAL PRINTER 58MM EMULATOR</div>
+    <div class="receipt-paper animate-print p-5 rounded-t-lg max-w-sm mx-auto text-xs font-mono">
+      <div class="text-center border-b border-zinc-300 pb-3 mb-3">
+        <div class="font-extrabold text-sm tracking-wider uppercase text-zinc-950">${sectorData.title}</div>
+        <div class="text-[10px] text-zinc-600 font-semibold">Sistem Kasir Mobile Balanjo POS</div>
+        <div class="inline-flex items-center gap-1 text-[10px] text-emerald-800 font-bold mt-1 bg-emerald-100 px-2 py-0.5 rounded">
+          <span>● THERMAL 58MM BLUETOOTH READY</span>
+        </div>
       </div>
       
-      <div class="text-[10px] text-zinc-400 border-b border-zinc-700/80 pb-2 mb-2 space-y-0.5">
+      <div class="text-[10px] text-zinc-600 border-b border-zinc-300 pb-2 mb-2 space-y-1">
         <div class="flex justify-between">
           <span>NO: ${trxId}</span>
           <span>${timeStr}</span>
         </div>
         <div class="flex justify-between">
           <span>TGL: ${dateStr}</span>
-          <span class="text-amber-400 font-bold">${orderLabel}</span>
+          <span class="text-zinc-900 font-bold">${orderLabel}</span>
         </div>
       </div>
 
-      <div class="space-y-1 border-b border-zinc-700/80 pb-2 mb-2">
+      <div class="space-y-1.5 border-b border-zinc-300 pb-3 mb-3">
         ${itemsHtml}
       </div>
 
-      <div class="space-y-1 text-[11px] pb-2 mb-2 border-b border-zinc-700/80">
-        <div class="flex justify-between font-bold text-sm text-emerald-400">
+      <div class="space-y-1 text-xs pb-3 mb-3 border-b-2 border-zinc-900">
+        <div class="flex justify-between font-black text-sm text-zinc-950">
           <span>TOTAL BAYAR:</span>
           <span>${formatRupiah(total)}</span>
         </div>
-        <div class="flex justify-between text-zinc-400">
+        <div class="flex justify-between text-zinc-600 text-[11px] pt-1">
           <span>STATUS:</span>
-          <span class="font-bold text-zinc-200">${statusLabel}</span>
+          <span class="font-bold text-zinc-900">${statusLabel}</span>
         </div>
       </div>
 
-      <div class="text-center text-[10px] text-zinc-500 pt-1">
-        *** TERIMA KASIH ATAS KUNJUNGANNYA ***<br>
-        <span class="text-zinc-600">Simulasi POS Lapangan Tanpa Ribet</span>
+      <!-- Barcode simulation -->
+      <div class="text-center pt-1 pb-2">
+        <div class="font-mono text-base tracking-[0.25em] font-black text-zinc-800 select-none">
+          ||| | |||| | || ||||| | |||
+        </div>
+        <div class="text-[9px] text-zinc-500 font-mono tracking-widest mt-0.5">${trxId}</div>
       </div>
+
+      <div class="text-center text-[10px] text-zinc-600 pt-1 border-t border-zinc-200">
+        *** TERIMA KASIH ATAS KUNJUNGANNYA ***<br>
+        <span class="text-zinc-500 text-[9px]">Sistem Kasir Lapangan oleh Lukmanisme</span>
+      </div>
+    </div>
+
+    <!-- Success Toast Notification -->
+    <div class="mt-3 text-center">
+      <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-xs font-mono font-bold border border-emerald-500/30">
+        <span>✓</span> Nota Berhasil Dicetak ke Printer Thermal
+      </span>
     </div>
   `;
 
-  // Scroll receipt into view smoothly
-  receiptContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  // Scroll receipt smoothly into view
+  setTimeout(() => {
+    receiptContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 100);
 }
 
 function formatRupiah(amount) {
@@ -512,7 +603,7 @@ function initConsultationModal() {
 
       const message = `Halo Mas Lukman (Lukmanisme),\n\nSaya ${name} dari usaha *${businessType}*.\nSaya tertarik dengan: *${topicLabel}*.\n\nCatatan tambahan: ${note || '-'}\n\nMohon info detail dan waktu untuk diskusi. Terima kasih!`;
       
-      const phone = '6281234567890'; // Placeholder - will replace with user's preferred number
+      const phone = '6281234567890'; // Placeholder - replace with actual number
       const waUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
       
       window.open(waUrl, '_blank');

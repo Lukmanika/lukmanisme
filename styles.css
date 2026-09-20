@@ -131,28 +131,30 @@ h1, h2, h3, h4, h5, h6 {
   0% {
     max-height: 0;
     opacity: 0;
-    transform: translateY(-15px) scaleY(0.9);
+    transform: translateY(-20px) scaleY(0.9);
   }
-  30% {
+  20% {
     opacity: 1;
   }
   100% {
-    max-height: 800px;
+    max-height: 1000px;
     opacity: 1;
     transform: translateY(0) scaleY(1);
   }
 }
 
 .receipt-paper {
-  background-color: var(--receipt-bg);
-  border: 1px dashed var(--receipt-border);
+  background-color: #FAF9F5 !important;
+  color: #18181B !important;
+  border: 1px dashed #A1A1AA !important;
   font-family: var(--font-mono);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0, 0, 0, 0.1);
   position: relative;
+  overflow: hidden;
 }
 
 .receipt-paper.animate-print {
-  animation: feedReceipt 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: feedReceipt 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* Jagged Zigzag Tear Effect at Receipt Bottom */
@@ -163,7 +165,7 @@ h1, h2, h3, h4, h5, h6 {
   left: 0;
   right: 0;
   height: 6px;
-  background: radial-gradient(circle, transparent, transparent 50%, var(--receipt-bg) 50%, var(--receipt-bg) 100%);
+  background: radial-gradient(circle, transparent, transparent 50%, #FAF9F5 50%, #FAF9F5 100%);
   background-size: 10px 10px;
 }
 
