@@ -435,10 +435,6 @@ function updateCartDisplay() {
   if (totalAmountEl) totalAmountEl.textContent = formatRupiah(total);
 }
 
-// Global functions for inline onclick handlers
-window.addItemToCartById = (id) => addItemToCartById(id);
-window.removeItemFromCart = (id) => removeItemFromCart(id);
-
 function generateThermalReceipt() {
   const receiptContainer = document.getElementById('pos-receipt-output');
   if (!receiptContainer) return;
